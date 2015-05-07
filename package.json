@@ -1,0 +1,25 @@
+{
+  "name": "shurl",
+  "version": "0.0.5",
+  "description": "URL shortener",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js --baseDir=./ --dataDir=./data/ --logDir=./logs/"
+  },
+  "dependencies": {
+    "redis": "*",
+    "log4js": "*"
+  },
+  "devDependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nmalitsky/shurl.git"
+  },
+  "keywords": [ 
+    "url shortener",
+    "base62 converter"
+  ],
+  "author": "Nikolay Malitsky <malitsky@gmail.com>",
+  "license": "ISC"
+}

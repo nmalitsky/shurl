@@ -10,7 +10,9 @@
             font: 13px normal Arial, Helvetica, sans-serif;
         }
 
-        html, body, div, span, object, iframe, h1, h2, h3, h4, h5, p, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption {
+        html, body, div, span, object, iframe, h1, h2, h3, h4, h5, p, a, abbr, acronym, 
+	address, code, del, dfn, em, img, q, 
+	dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption {
             margin: 0;
             padding: 0;
         }
@@ -80,16 +82,23 @@
             elemId('result').innerHTML = '';
 
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', window.location.protocol + '//' + window.location.host + '/add/?url=' + escape(elemId('url').value));
+            xhr.open('GET', window.location.protocol + '//' + window.location.host +
+            '/add/?url=' + encodeURI(elemId('url').value));
             xhr.onreadystatechange = function () {
                 try {
                     if (xhr.readyState == 4) {
-                        var json = JSON.parse(xhr.responseText);
-                        elemId('result').href = window.location.protocol + '//' + window.location.host + '/' + json._shortUrl;
-                        elemId('result').innerHTML = window.location.protocol + '//' + window.location.host + '/' + json._shortUrl;
+                        if (xhr.status == 200) {
+                            var json = JSON.parse(xhr.responseText);
+                            elemId('result').href =
+                                    window.location.protocol + '//' + window.location.host + '/' + json.shortUrlPath;
+                            elemId('result').innerHTML =
+                                    window.location.protocol + '//' + window.location.host + '/' + json.shortUrlPath;
+                        } else {
+                            alert('Error: server can`t response');
+                        }
                     }
                 } catch (e) {
-                    console.log(e.message)
+                    alert('Error:' + e.message);
                 }
             };
             xhr.send();
@@ -107,8 +116,8 @@
             </tr>
             <tr>
                 <td>
-                    <input type="url" name="url">
-                    <input type="button" value="Do!" onclick="getShortUrl()">
+                    <input type="url" id="url">
+                    <input type="submit" value="Do!">
                 </td>
                 <td>
                     <a id="result" target="_blank"></a>

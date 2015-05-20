@@ -9,33 +9,29 @@ var Dirs = require('./app_modules/dirs'),
 var Config = require('./app_modules/config');
     config = new Config(dirs);
 
-// storage for url maps
+// storage for SHURL
 var Storage = require('./app_modules/storage'),
-    storage = new Storage(config, dirs);
-storage.init();
+    storage = new Storage(dirs, config);
 
-var log4js = require('log4js');
-log4js.configure(path.join(dirs.baseDir, 'log4js.json'), { cwd: dirs.logDir });
-var log = log4js.getLogger('AppLogger');
-var err_log = log4js.getLogger('ErrorLogger');
-
-var _shortUrlLength = 5;
-
+var MIN_SHORT_URL_PATH_LENGTH = 5;
 // base62 converter
 var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-var getShortUrl = function (num) {
-    var _shortUrl = '';
+function createShortUrlPath(num) {
+    var shortUrlPath = '';
     do {
-        _shortUrl = chars[num % 62] + _shortUrl;
+        shortUrlPath = chars[num % 62] + shortUrlPath;
     }
     while (num = Math.floor(num / 62));
-    return _shortUrl;
-};
+    return shortUrlPath;
+}
 
 // http server
 var srv = http.createServer(function (req, res) {
     var param = parse(req.url, true);
+
     switch (param.pathname) {
+
+        // load UI
         case config.uiPath:
             var htmlFile = path.join(dirs.baseDir, config.indexPage);
             fs.exists(htmlFile, function (exists) {
@@ -49,38 +45,44 @@ var srv = http.createServer(function (req, res) {
             });
             break;
 
+        // create new short url from original url
         case '/add/':
-            if (param.query.url != undefined) {
-                var _shortUrl = storage.getShortUrl(param.query.url);
-                if (_shortUrl == undefined) {
-                    _shortUrl = getShortUrl(storage.getCnt());
-                    while (_shortUrl.length < _shortUrlLength) {
-                        _shortUrl = chars[0] + _shortUrl;
+            var originalUrl = param.query.url;
+            if (originalUrl !== undefined) {
+                storage.getShortForFull(originalUrl, function(err, shortUrlPath) {
+                    if (shortUrlPath == undefined) {
+                        shortUrlPath = createShortUrlPath(storage.getUid());
+                        while (shortUrlPath.length < MIN_SHORT_URL_PATH_LENGTH) {
+                            shortUrlPath = chars[0] + shortUrlPath;
+                        }
+                        storage.setShortForFull(shortUrlPath, originalUrl);
                     }
-                    storage.update(param.query.url, _shortUrl)
-                }
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                res.end(JSON.stringify({
-                    shortUrl: 'http://' + config.host + ':' + config.port + '/' + _shortUrl,
-                    _shortUrl: _shortUrl
-                }));
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.end(JSON.stringify({
+                        shortUrl: 'http://' + config.host + ':' + config.port + '/' +
+                            shortUrlPath,
+                        shortUrlPath: shortUrlPath
+                    }));
+                });
             }
             break;
 
+        // go to the original url to from short url
         default:
-            var longUrl = storage.getLongUrl(param.pathname.substring(1));
-            if (longUrl != undefined) {
-                res.writeHead(302, {'Location': longUrl});
-                res.end();
-            } else {
-                res.writeHead(404, {'Content-Type': 'text/plain'});
-                res.end('404 - Requested url not found');
-            }
+            var shortUrlPath = param.pathname.substring(1);
+            storage.getFullForShort(shortUrlPath, function(err, originalUrl) {
+                if (originalUrl != undefined) {
+                    res.writeHead(302, {'Location': originalUrl});
+                    res.end();
+                } else {
+                    res.writeHead(404, {'Content-Type': 'text/plain'});
+                    res.end('404 - Requested url not found');
+                }
+            });
     }
 }).listen(config.port, config.host);
 
-console.log('Server running at http://' + config.host + ':' + config.port);
-console.log('Open in you browser http://' + config.host + ':' + config.port + config.uiPath);
-
-log.info('Server running at http://' + config.host + ':' + config.port);
-log.info('Open in you browser http://' + config.host + ':' + config.port + config.uiPath);
+console.log('Server running at http://' +
+    config.host + ':' + config.port);
+console.log('Open in you browser http://' +
+    config.host + ':' + config.port + config.uiPath);

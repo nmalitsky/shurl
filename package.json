@@ -1,6 +1,6 @@
 {
   "name": "shurl",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "URL shortener",
   "main": "app.js",
   "scripts": {

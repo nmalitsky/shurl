@@ -14,7 +14,7 @@ var Dirs = function () {
     }
 
     app_args.forEach(function (val) {
-        global.par = val.split('=');
+        var par = val.split('=');
         switch (par[0]) {
             case '--baseDir':
                 baseDir = par[1];
@@ -33,7 +33,7 @@ var Dirs = function () {
         process.exit(1);
     }
 
-    if (!fs.existsSync(baseDir)) {
+    if (baseDir && !fs.existsSync(baseDir)) {
         console.log("Can't resolve path --baseDir=" + baseDir);
         process.exit(1);
     }
@@ -46,7 +46,7 @@ var Dirs = function () {
         process.exit(1);
     }
 
-    if (!fs.existsSync(logDir)) {
+    if (logDir && !fs.existsSync(logDir)) {
         console.log("Can't resolve path --logDir=" + logDir);
         process.exit(1);
     }

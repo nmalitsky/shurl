@@ -1,13 +1,11 @@
 var path = require('path'),
-    redis = require('redis');
+    redis = require('redis'),
+    log4js = require('log4js');
 
-var log4js = require('log4js');
+var log = log4js.getLogger('AppLogger');
+var err_log = log4js.getLogger('ErrorLogger');
 
-var Storage = function (dirs, config) {
-    log4js.configure(path.join(dirs.baseDir, 'log4js.json'), {cwd: dirs.logDir});
-    var log = log4js.getLogger('AppLogger');
-    var err_log = log4js.getLogger('ErrorLogger');
-
+var Storage = function (config) {
     var client = redis.createClient(config.redis.port, config.redis.host);
     client.on('error', function (err) {
         var redisSrv = config.redis.host + ':' + config.redis.port;

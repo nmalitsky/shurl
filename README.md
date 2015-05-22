@@ -13,7 +13,7 @@ System requirements:
 Config of the application in:
 -----------------------------
 
-    ./config.json
+    ./config/app.json
 
 Logging
 -------
@@ -21,7 +21,7 @@ Logs (`log4js`) are stored in the directory specified in the parameter `--logDir
 
 Parameters for `log4js` in:
 
-    ./log4js.json
+    ./config/log4js.json
 
 Install with:
 -------------
@@ -30,7 +30,7 @@ Install with:
 Examples start service:
 ----------------------
 
-- npm start
+    npm start
 
 Start the service and open in the your browser:
 

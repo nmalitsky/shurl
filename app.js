@@ -1,17 +1,20 @@
 var http = require('http'),
     parse = require('url').parse,
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    log4js = require('log4js');
 
 var Dirs = require('./app_modules/dirs'),
     dirs = new Dirs();
 
+log4js.configure(path.join(dirs.baseDir, 'config/log4js.json'), {cwd: dirs.logDir});
+
 var Config = require('./app_modules/config');
-config = new Config(dirs);
+config = new Config(path.join(dirs.baseDir, 'config/app.json'));
 
 // storage for SHURL
 var Storage = require('./app_modules/storage'),
-    storage = new Storage(dirs, config);
+    storage = new Storage(config);
 
 var MIN_SHORT_URL_PATH_LENGTH = 5;
 // base62 converter

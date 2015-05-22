@@ -1,0 +1,10 @@
+{
+  "host": "127.0.0.1",
+  "port": 4444,
+  "uiPath": "/shurl/",
+  "indexPage": "web/index.html",
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379
+  }
+}

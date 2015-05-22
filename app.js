@@ -7,7 +7,7 @@ var Dirs = require('./app_modules/dirs'),
     dirs = new Dirs();
 
 var Config = require('./app_modules/config');
-    config = new Config(dirs);
+config = new Config(dirs);
 
 // storage for SHURL
 var Storage = require('./app_modules/storage'),
@@ -16,6 +16,7 @@ var Storage = require('./app_modules/storage'),
 var MIN_SHORT_URL_PATH_LENGTH = 5;
 // base62 converter
 var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
 function createShortUrlPath(num) {
     var shortUrlPath = '';
     do {
@@ -49,7 +50,7 @@ var srv = http.createServer(function (req, res) {
         case '/add/':
             var originalUrl = param.query.url;
             if (originalUrl !== undefined) {
-                storage.getShortForFull(originalUrl, function(err, shortUrlPath) {
+                storage.getShortForFull(originalUrl, function (err, shortUrlPath) {
                     if (shortUrlPath == undefined) {
                         shortUrlPath = createShortUrlPath(storage.getUid());
                         while (shortUrlPath.length < MIN_SHORT_URL_PATH_LENGTH) {
@@ -60,7 +61,7 @@ var srv = http.createServer(function (req, res) {
                     res.writeHead(200, {'Content-Type': 'text/html'});
                     res.end(JSON.stringify({
                         shortUrl: 'http://' + config.host + ':' + config.port + '/' +
-                            shortUrlPath,
+                        shortUrlPath,
                         shortUrlPath: shortUrlPath
                     }));
                 });
@@ -70,7 +71,7 @@ var srv = http.createServer(function (req, res) {
         // go to the original url to from short url
         default:
             var shortUrlPath = param.pathname.substring(1);
-            storage.getFullForShort(shortUrlPath, function(err, originalUrl) {
+            storage.getFullForShort(shortUrlPath, function (err, originalUrl) {
                 if (originalUrl != undefined) {
                     res.writeHead(302, {'Location': originalUrl});
                     res.end();
@@ -82,7 +83,6 @@ var srv = http.createServer(function (req, res) {
     }
 }).listen(config.port, config.host);
 
-console.log('Server running at http://' +
-    config.host + ':' + config.port);
-console.log('Open in you browser http://' +
-    config.host + ':' + config.port + config.uiPath);
+console.log('Server running at http://' +config.host + ':' + config.port);
+console.log('Open in you browser http://' + config.host + ':' + config.port + config.uiPath);
+

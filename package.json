@@ -1,10 +1,10 @@
 {
   "name": "shurl",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "URL shortener",
-  "main": "app.js",
+  "main": "./app.js",
   "scripts": {
-    "start": "node app.js --baseDir=./ --dataDir=./data/ --logDir=./logs/"
+    "start": "node app.js --baseDir=./ --logDir=./logs/"
   },
   "dependencies": {
     "redis": "*",
